@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GSC Insights</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-title">GSC Insights</div>
+      <button id="logout-btn" class="icon-btn" title="Sign out">↩</button>
+    </div>
+
+    <!-- URL strip -->
+    <div id="url-strip" class="url-strip">—</div>
+
+    <!-- Auth screen -->
+    <div id="auth-screen" class="screen">
+      <p class="muted">Connect Google Search Console to get started.</p>
+      <button id="login-btn" class="primary-btn">Connect GSC Account</button>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading-screen" class="screen hidden">
+      <div class="spinner"></div>
+      <p class="muted">Fetching data…</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-screen" class="screen hidden">
+      <p class="error-msg" id="error-msg"></p>
+      <button id="retry-btn" class="primary-btn">Retry</button>
+    </div>
+
+    <!-- Main dashboard -->
+    <div id="dashboard" class="hidden">
+
+      <!-- Period tabs -->
+      <div class="tabs" id="period-tabs">
+        <button class="tab active" data-period="3">3 Days</button>
+        <button class="tab" data-period="7">7 Days</button>
+        <button class="tab" data-period="28">28 Days</button>
+      </div>
+
+      <!-- Metrics cards -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Clicks</div>
+          <div class="metric-value" id="metric-clicks">—</div>
+          <div class="metric-change" id="metric-clicks-change"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Impressions</div>
+          <div class="metric-value" id="metric-impressions">—</div>
+          <div class="metric-change" id="metric-impressions-change"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Avg CTR</div>
+          <div class="metric-value" id="metric-ctr">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Avg Position</div>
+          <div class="metric-value" id="metric-position">—</div>
+        </div>
+      </div>
+
+      <!-- Top Queries -->
+      <div class="section">
+        <div class="section-title">Top Queries</div>
+        <div id="top-queries-list" class="query-list"></div>
+      </div>
+
+      <!-- Underperforming Queries -->
+      <div class="section">
+        <div class="section-title">⚠ Underperforming Queries</div>
+        <p class="section-hint">High impressions, low CTR (CTR &lt; avg)</p>
+        <div id="underperforming-list" class="query-list"></div>
+      </div>
+
+      <!-- Exam Intelligence -->
+      <div class="section exam-section">
+        <div class="section-title">Exam Intelligence</div>
+
+        <div class="exam-card">
+          <div class="exam-label">Detected Exam</div>
+          <div class="exam-value" id="exam-name">—</div>
+        </div>
+
+        <div class="exam-card">
+          <div class="exam-label">TAM (Search Volume)</div>
+          <div class="exam-value" id="exam-tam">—</div>
+          <div class="exam-hint" id="exam-tam-hint"></div>
+        </div>
+
+        <div class="exam-card">
+          <div class="exam-label">Upcoming Exam Event</div>
+          <div class="exam-value" id="exam-event">—</div>
+        </div>
+      </div>
+
+    </div><!-- /dashboard -->
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
