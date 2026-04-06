@@ -26,7 +26,7 @@ function dateRange(daysBack) {
 
 // ─── Extract exam slug from URL ───────────────────────────────────────────────
 
-const ANTHROPIC_API_KEY = "sk-ant-YOUR_KEY_HERE"; // ← paste your Anthropic API key
+const ANTHROPIC_API_KEY = "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"; // ← paste your Anthropic API key
 
 async function getPageContent(tabId) {
   return new Promise((resolve) => {
