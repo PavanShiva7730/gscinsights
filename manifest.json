@@ -6,7 +6,8 @@
   "permissions": ["identity", "activeTab", "storage", "tabs"],
   "host_permissions": [
     "https://www.googleapis.com/*",
-    "https://searchconsole.googleapis.com/*"
+    "https://searchconsole.googleapis.com/*",
+    "https://*.testbook.com/*"
   ],
   "oauth2": {
     "client_id": "724972609650-87o79hhfrmt5o1rudpupcerrnr5fgp7f.apps.googleusercontent.com",
@@ -25,6 +26,13 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://*.testbook.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "background": {
     "service_worker": "background.js"
   }
