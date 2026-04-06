@@ -26,12 +26,97 @@ function dateRange(daysBack) {
 
 // ─── Extract exam slug from URL ───────────────────────────────────────────────
 
-function detectExam(url) {
-  const match = url.match(/testbook\.com\/(?:exams?|govt-jobs)\/([^/?#]+)/i);
-  if (!match) return null;
-  const slug = match[1];
-  const name = slug.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-  return { slug, name };
+const ANTHROPIC_API_KEY = "sk-ant-YOUR_KEY_HERE"; // ← paste your Anthropic API key
+
+async function getPageContent(tabId) {
+  return new Promise((resolve) => {
+    chrome.tabs.sendMessage(tabId, { type: "GET_PAGE_CONTENT" }, (res) => {
+      resolve(res || {});
+    });
+  });
+}
+
+async function getExamIntelligence(pageData, url) {
+  const prompt = `
+You are an expert on Indian competitive exams. Analyze this webpage and return ONLY a JSON object, no markdown, no explanation.
+
+URL: ${url}
+Page Title: ${pageData.title}
+H1: ${pageData.h1}
+Meta Description: ${pageData.metaDesc}
+Breadcrumb: ${pageData.breadcrumb}
+Page Content Snippet: ${pageData.bodySnippet}
+
+Return this exact JSON:
+{
+  "examName": "Full official exam name, e.g. SSC CGL 2025",
+  "isExamPage": true or false,
+  "tam": "Monthly search volume estimate like 2.4M or 800K or 120K",
+  "tamNote": "one short phrase like 'High demand, Tier 1 exam' or 'State-level, moderate demand'",
+  "upcomingEvent": "Next important date or event, e.g. 'Notification expected June 2025' or 'Admit Card releasing April 2025'",
+  "insight": "One sharp SEO insight for this page in under 15 words"
+}
+
+Use your knowledge of Indian exam calendars and search trends for TAM and events. If not an exam page, set isExamPage to false and use null for other fields.
+`;
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-opus-4-20250514",
+      max_tokens: 400,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  if (!res.ok) throw new Error("Claude API error: " + res.status);
+  const data = await res.json();
+  const text = data.content[0].text.trim();
+  return JSON.parse(text);
+}
+
+async function renderExam(url, tabId) {
+  $("exam-name").textContent = "Analyzing page…";
+  $("exam-tam").textContent = "…";
+  $("exam-event").textContent = "…";
+
+  try {
+    const pageData = await getPageContent(tabId);
+    const intel = await getExamIntelligence(pageData, url);
+
+    if (!intel.isExamPage) {
+      $("exam-name").textContent = "Not an exam page";
+      $("exam-tam").textContent = "—";
+      $("exam-tam-hint").textContent = "";
+      $("exam-event").textContent = "—";
+      return;
+    }
+
+    $("exam-name").textContent = intel.examName || "—";
+    $("exam-tam").textContent = intel.tam || "—";
+    $("exam-tam-hint").textContent = intel.tamNote || "";
+    $("exam-event").textContent = intel.upcomingEvent || "—";
+
+    // Show insight if present
+    if (intel.insight) {
+      const insightEl = document.createElement("div");
+      insightEl.className = "exam-card";
+      insightEl.innerHTML = `
+        <div class="exam-label">SEO Insight</div>
+        <div class="exam-value" style="font-size:12px;color:#1a73e8;">${intel.insight}</div>
+      `;
+      document.querySelector(".exam-section").appendChild(insightEl);
+    }
+
+  } catch (e) {
+    $("exam-name").textContent = "Error: " + e.message;
+  }
 }
 
 // ─── TAM lookup (hardcoded seed + AI fallback label) ─────────────────────────
@@ -251,13 +336,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     show("auth-screen");
   }
 
-  async function loadAll() {
+ async function loadAll() {
     hide("auth-screen", "error-screen");
     show("loading-screen");
     try {
       currentData = {};
       await loadData(token, pageUrl, currentPeriod);
-      renderExam(pageUrl);
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });  // ← NEW
+      await renderExam(pageUrl, tab.id);                                              // ← CHANGED
       hide("loading-screen");
       show("dashboard");
     } catch (e) {
