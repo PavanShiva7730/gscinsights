@@ -9,7 +9,7 @@
     "https://searchconsole.googleapis.com/*"
   ],
   "oauth2": {
-    "client_id": "YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com",
+    "client_id": "724972609650-87o79hhfrmt5o1rudpupcerrnr5fgp7f.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/webmasters.readonly"]
   },
   "action": {
