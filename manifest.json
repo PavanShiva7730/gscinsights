@@ -4,11 +4,12 @@
   "version": "1.0.0",
   "description": "GSC Clicks, Impressions, Queries & Exam TAM for the current Testbook page",
   "permissions": ["identity", "activeTab", "storage", "tabs"],
-  "host_permissions": [
-    "https://www.googleapis.com/*",
-    "https://searchconsole.googleapis.com/*",
-    "https://*.testbook.com/*"
-  ],
+"host_permissions": [
+  "https://www.googleapis.com/*",
+  "https://searchconsole.googleapis.com/*",
+  "https://*.testbook.com/*",
+  "https://api.openai.com/*"
+],
   "oauth2": {
     "client_id": "724972609650-87o79hhfrmt5o1rudpupcerrnr5fgp7f.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/webmasters.readonly"]
